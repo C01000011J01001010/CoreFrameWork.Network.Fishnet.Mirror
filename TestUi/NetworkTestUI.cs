@@ -1,5 +1,3 @@
-
-
 using UnityEngine;
 using TMPro; // TextMeshPro를 사용하기 위한 네임스페이스
 using UnityEngine.UI;
@@ -7,7 +5,7 @@ using FishNet;
 using UnityEngine.Networking;
 using System.Threading.Tasks;
 
-namespace CoreEngine.Network
+namespace CoreEngine.Network.FishNetExtension
 {
     public class NetworkTestUI : BaseUi, IUi
     {
