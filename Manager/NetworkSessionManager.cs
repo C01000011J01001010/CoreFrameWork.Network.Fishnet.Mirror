@@ -13,6 +13,9 @@ namespace CoreEngine.Network
         [SerializeField] private LocalConnectionState _lastClientState;
         [SerializeField] private LocalConnectionState _lastServerState;
 
+        private bool _isClientConnecting;
+        private bool _isServerStarting;
+
         protected override void OnEnable()
         {
             base.OnEnable();
@@ -68,50 +71,69 @@ namespace CoreEngine.Network
             }
         }
 
-        // 클라이언트 콜백 수신부
+        
+
         private void OnClientStateChanged(ClientConnectionStateArgs args)
         {
-            if (args.ConnectionState == LocalConnectionState.Started)
+            switch (args.ConnectionState)
             {
-                EventBus<NetworkConnectionSuccessEvent>.Publish(new NetworkConnectionSuccessEvent());
-            }
-            else if (args.ConnectionState == LocalConnectionState.Stopped)
-            {
-                switch(_lastClientState)
-                {
-                    case LocalConnectionState.Starting:
-                        string meg = "호스트를 찾을 수 없거나\n타임아웃 되었습니다.";
-                        EventBus<NetworkConnectionFailEvent>.Publish(new NetworkConnectionFailEvent { ErrorMessage = meg }); 
-                        break;
-                    case LocalConnectionState.Stopping:
-                        EventBus< NetworkConnectionLostEvent >.Publish(new NetworkConnectionLostEvent());
-                        break;
-                }
-                    
+                case LocalConnectionState.Starting:
+                    _isClientConnecting = true;
+                    break;
+
+                case LocalConnectionState.Started:
+                    _isClientConnecting = false;
+                    EventBus<NetworkConnectionSuccessEvent>.Publish(new NetworkConnectionSuccessEvent());
+                    break;
+
+                case LocalConnectionState.Stopped:
+                    if (_isClientConnecting)
+                    {
+                        // 연결 시도 중 실패
+                        _isClientConnecting = false;
+                        const string message = "호스트를 찾을 수 없거나\n타임아웃 되었습니다.";
+                        EventBus<NetworkConnectionFailEvent>.Publish(new NetworkConnectionFailEvent{ErrorMessage = message});
+                    }
+                    else
+                    {
+                        // 이미 연결된 상태에서 연결이 끊김
+                        EventBus<NetworkConnectionLostEvent>.Publish(new NetworkConnectionLostEvent());
+                    }
+                    break;
             }
 
             _lastClientState = args.ConnectionState;
         }
 
+
         // 서버 콜백 수신부
         private void OnServerStateChanged(ServerConnectionStateArgs args)
         {
-            if (args.ConnectionState == LocalConnectionState.Started)
+            switch (args.ConnectionState)
             {
-                EventBus<NetworkConnectionSuccessEvent>.Publish(new NetworkConnectionSuccessEvent());
-            }
-            else if (args.ConnectionState == LocalConnectionState.Stopped)
-            {
-                switch (_lastServerState)
-                {
-                    case LocalConnectionState.Starting:
-                        string meg = "서버 개설에 실패했습니다.";
-                        EventBus<NetworkConnectionFailEvent>.Publish(new NetworkConnectionFailEvent { ErrorMessage = meg });
-                        break;
-                    case LocalConnectionState.Stopping:
+                case LocalConnectionState.Starting:
+                    _isServerStarting = true;
+                    break;
+
+                case LocalConnectionState.Started:
+                    _isServerStarting = false;
+                    EventBus<NetworkConnectionSuccessEvent>.Publish(new NetworkConnectionSuccessEvent());
+                    break;
+
+                case LocalConnectionState.Stopped:
+                    if (_isServerStarting)
+                    {
+                        // 서버 개설 실패
+                        _isServerStarting = false;
+                        const string message = "서버 개설에 실패했습니다.";
+                        EventBus<NetworkConnectionFailEvent>.Publish(new NetworkConnectionFailEvent{ ErrorMessage = message});
+                    }
+                    else
+                    {
+                        // 정상적으로 실행된 서버가 종료됨
                         EventBus<NetworkConnectionLostEvent>.Publish(new NetworkConnectionLostEvent());
-                        break;
-                }
+                    }
+                    break;
             }
 
             _lastServerState = args.ConnectionState;
