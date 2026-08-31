@@ -37,11 +37,12 @@ namespace CoreEngine.Network.FishNetExtension
         // 방장의 네트워크 씬 로딩 요청을 가로채서 FishNet API로 전환
         protected override void OnSceneLoadRequest(SceneLoadRequestEvent evt)
         {
-            if (_isRoutine) return;
-            _isRoutine = true;
-
             if (InstanceFinder.IsServerStarted)
             {
+                // 네트워크 상태일 때만 자식 클래스에서 중복 실행을 잠금
+                if (_isRoutine) return;
+                _isRoutine = true;
+
                 // GlobalScene 보호: FishNet이 네트워크로 로드된 씬만 교체하도록 설정
                 SceneLoadData sld = new SceneLoadData(evt.TargetSceneName);
                 sld.ReplaceScenes = ReplaceOption.OnlineOnly;
@@ -49,7 +50,8 @@ namespace CoreEngine.Network.FishNetExtension
             }
             else
             {
-                // 오프라인 상태라면 부모 클래스의 유니티 SceneManager 방식을 사용합니다.
+                // 오프라인 상태라면 부모 클래스의 유니티 SceneManager 방식을 사용
+                // 오프라인 상태라면 방어 로직( _isRoutine 체크 )까지 부모에게 완전히 위임
                 base.OnSceneLoadRequest(evt);
             }
         }
