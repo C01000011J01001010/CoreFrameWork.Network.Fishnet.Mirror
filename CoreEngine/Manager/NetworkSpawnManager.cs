@@ -1,8 +1,8 @@
-﻿using CoreEngine.EventBus;
-using CoreEngine.Facades;
+﻿using CoreEngine.Facades;
+using CoreEngine.Helpers;
 using CoreEngine.Manager;
-using FishNet.Object;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -32,26 +32,42 @@ namespace CoreEngine.Network.FishNetExtension.Manager
         // 틱 연산 완전 배제[cite: 8]
         protected override NetworkTickTarget networkTickTarget => NetworkTickTarget.None;
 
+        private bool _isServerStarted;
+
         public override void OnStartServer()
         {
             base.OnStartServer();
-            EventBus<SceneReadyEvent>.Subscribe(OnSceneReady); 
+            _isServerStarted = true;
         }
 
         public override void OnStopServer()
         {
             base.OnStopServer();
-            EventBus<SceneReadyEvent>.Unsubscribe(OnSceneReady); 
+            _isServerStarted = false;
         }
 
-        private void OnSceneReady(SceneReadyEvent evt)
+        public override IEnumerator Initialize()
+        {
+            yield return base.Initialize();
+
+            // FishNet 서버가 완전히 올라올 때까지 대기
+            while (!_isServerStarted)
+            {
+                yield return null;
+            }
+
+            // 100% 보장된 인프라 위에서 안전하게 풀링 및 스폰 실행
+            SpawnAllEntities();
+        }
+
+        private void SpawnAllEntities()
         {
             // Facade를 통해 나와 동일한 Enum 타입을 쓰는 풀 매니저를 호출
             var poolManager = CoreFacade.GetManager<ObjectPoolManager<TPoolType>>();
 
             if (poolManager == null)
             {
-                Debug.LogError($"[{this.GetType().Name}] 풀 매니저를 찾을 수 없습니다.");
+                LogHelper.Log($"[{this.GetType().Name}] 풀 매니저를 찾을 수 없습니다.", LogColor.Red);
                 return;
             }
 
@@ -66,7 +82,9 @@ namespace CoreEngine.Network.FishNetExtension.Manager
                 }
             }
 
-            Debug.Log($"[{this.GetType().Name}] {spawnDataList.Count}개의 인게임 객체 동적 스폰 완료!");
+            LogHelper.Log($"[{this.GetType().Name}] {spawnDataList.Count}개의 인게임 객체 동적 스폰 완료!", LogColor.Green);
         }
+
+        
     }
 }
