@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 732595751391897105}
   - component: {fileID: 4232661739899300953}
   - component: {fileID: 3891896328913707867}
+  - component: {fileID: 8751641121315456848}
   m_Layer: 0
   m_Name: LobbySessionManager
   m_TagString: Untagged
@@ -80,7 +81,7 @@ MonoBehaviour:
   _teleportThreshold: 1
   <PrefabId>k__BackingField: 0
   <SpawnableCollectionId>k__BackingField: 0
-  <AssetPathHash>k__BackingField: 3837105862427545165
+  <AssetPathHash>k__BackingField: 13420444466836695140
   SceneId: 0
   SerializedTransformProperties:
     Position: {x: 0, y: 0, z: 0}
@@ -106,3 +107,18 @@ MonoBehaviour:
   _preventDespawnOnDisconnect: 0
   _defaultDespawnType: 0
   _initializedTimestamp: -8584134735778577712
+--- !u!114 &8751641121315456848
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5158061332734186352}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c71fd7f855ec523429999fc4e14a1928, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FishNet.Runtime::FishNet.Observing.NetworkObserver
+  _overrideType: 3
+  _updateHostVisibility: 1
+  _observerConditions: []

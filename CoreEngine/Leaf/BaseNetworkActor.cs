@@ -2,11 +2,11 @@
 using CoreEngine.EventBus;
 using CoreEngine.Hub;
 
-namespace CoreEngine.Network
+namespace CoreEngine.Network.FishNetExtension
 {
     // 멀티플레이 객체용 3계층 Leaf 기본 클래스
 
-    public abstract class BaseActorNetworked : BaseLeafNetworked, IActor
+    public abstract class BaseNetworkActor : BaseNetworkLeaf, IActor
     {
         public override void OnStartNetwork()
         {

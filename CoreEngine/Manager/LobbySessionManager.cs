@@ -1,18 +1,21 @@
-using CoreEngine.EventBus;
+using UnityEngine;
 using FishNet.Connection;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using FishNet.Observing;
-using UnityEngine;
+using CoreEngine.EventBus;
+using CoreEngine.Network.Lobby;
 
-namespace CoreEngine.Network.Lobby
+namespace CoreEngine.Network.FishNetExtension.Manager
 {
     [RequireComponent(typeof(NetworkObserver))] // 항상 보여야하니
-    public class LobbySessionManager : NetworkBehaviour
+    public class LobbySessionManager : BaseNetworkManager
     {
         // 4명에게서 받은 데이터를 저장하고, 모든 클라이언트에게 자동으로 뿌려주기 위해 SyncDictionary 사용
         
         private readonly SyncDictionary<int, string> _connectedClients = new SyncDictionary<int, string>();
+
+        protected override NetworkTickTarget networkTickTarget => NetworkTickTarget.None;
 
         public override void OnStartNetwork()
         {
@@ -29,6 +32,7 @@ namespace CoreEngine.Network.Lobby
 
         public override void OnStartServer()
         {
+            base.OnStartServer();
             // 이전 Host에 의한 강제 종료시 찌꺼기 데이터를 완벽히 백지화
             _connectedClients.Clear();
             // 서버가 열리면 접속/해제 이벤트를 수신하여 딕셔너리 관리
@@ -37,6 +41,7 @@ namespace CoreEngine.Network.Lobby
 
         public override void OnStopServer()
         {
+            base.OnStopServer();
             ServerManager.OnRemoteConnectionState -= OnRemoteConnectionState;
         }
 

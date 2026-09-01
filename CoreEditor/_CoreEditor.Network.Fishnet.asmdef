@@ -1,0 +1,19 @@
+{
+    "name": "CoreEditor.Network.Fishnet",
+    "rootNamespace": "",
+    "references": [
+        "GUID:ab36ce23fda471b49a477d4debae2877",
+        "GUID:b87664a26abe655449a971f0219fa161",
+        "GUID:0cf45f29437ebe145be5e7d5b8e0374a",
+        "GUID:61bba107841cfa046a0f70a3f7a4f7fe"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -331,6 +331,10 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3897757980910931800, guid: 3e97cf00a1f291040a80fa618483df54, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0.000026810458
+      objectReference: {fileID: 0}
     - target: {fileID: 4657280734159398238, guid: 3e97cf00a1f291040a80fa618483df54, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -505,6 +509,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7149853346011939267, guid: 3e97cf00a1f291040a80fa618483df54, type: 3}
       propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7149853346011939267, guid: 3e97cf00a1f291040a80fa618483df54, type: 3}
+      propertyPath: m_AnchorMin.y
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7153250225943697946, guid: 3e97cf00a1f291040a80fa618483df54, type: 3}
@@ -921,7 +929,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1403812043643056339, guid: 1b07c6a55ecb0204793961c5bd26bdd3, type: 3}
       propertyPath: _globalScene.scenePath
-      value: Assets/CoreFramework.Network.Fishnet/Scene/GlobalScene Fishnet.unity
+      value: Assets/CoreFramework.Network.Fishnet/CoreEngine/Scene/GlobalScene Fishnet.unity
       objectReference: {fileID: 0}
     - target: {fileID: 1403812043643056339, guid: 1b07c6a55ecb0204793961c5bd26bdd3, type: 3}
       propertyPath: _globalScene.sceneAsset
