@@ -1,6 +1,7 @@
 ﻿using CoreEngine.Facades;
 using CoreEngine.Helpers;
 using CoreEngine.Manager;
+using FishNet;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -19,7 +20,9 @@ namespace CoreEngine.Network.FishNetExtension.Manager
     /// <summary>
     /// 풀링 시스템과 연동되어 씬 초기화 시 서버 권위 객체들을 스폰하는 제네릭 매니저
     /// </summary>
-    public abstract class NetworkSpawnManager<TPoolType> : BaseNetworkManager where TPoolType : Enum
+    public abstract class NetworkSpawnManager<TPoolType, TPoolManager> : BaseNetworkManager 
+        where TPoolType : Enum
+        where TPoolManager : ObjectPoolManager<TPoolType>
     {
         [Header("Spawn Settings")]
         [Tooltip("CSV 또는 에디터 기즈모를 통해 세팅된 초기 스폰 데이터")]
@@ -50,6 +53,12 @@ namespace CoreEngine.Network.FishNetExtension.Manager
         {
             yield return base.Initialize();
 
+            // 서버 권한 없이 순수 클라이언트로 접속한 경우 스폰 로직을 즉시 탈출
+            if (InstanceFinder.IsClientStarted && !InstanceFinder.IsServerStarted)
+            {
+                yield break;
+            }
+
             // FishNet 서버가 완전히 올라올 때까지 대기
             while (!_isServerStarted)
             {
@@ -63,7 +72,8 @@ namespace CoreEngine.Network.FishNetExtension.Manager
         private void SpawnAllEntities()
         {
             // Facade를 통해 나와 동일한 Enum 타입을 쓰는 풀 매니저를 호출
-            var poolManager = CoreFacade.GetManager<ObjectPoolManager<TPoolType>>();
+            // Get모듈은 구체타입을 명시해야 하므로 제네릭 타입 TPoolManager를 그대로 전달
+            var poolManager = CoreFacade.GetManager<TPoolManager>();
 
             if (poolManager == null)
             {

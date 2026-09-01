@@ -1,5 +1,4 @@
 using UnityEngine;
-
 namespace CoreEngine.Network.FishNetExtension.Manager.Test
 {
     public enum TestPoolType
@@ -8,7 +7,7 @@ namespace CoreEngine.Network.FishNetExtension.Manager.Test
         Ally,
         Neutral
     }
-    public class TestSpawnManager : NetworkSpawnManager<TestPoolType>
+    public class TestNetworkSpawnManager : NetworkSpawnManager<TestPoolType, TestNetworkPoolManager>
     {
 
     }
