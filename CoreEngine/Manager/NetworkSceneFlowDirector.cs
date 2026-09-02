@@ -64,12 +64,17 @@ namespace CoreEngine.Network.FishNetExtension
             // 모든 클라이언트 동기화: 방장과 참가자 모두 여기서 이전 오프라인 씬(TitleScene 등)을 정리
             if (currentScene.IsValid() && currentScene.isLoaded)
             {
+                // 씬 겹침(Overlap)으로 인한 싱글톤 충돌을 막기 위해,
+                // 비동기 언로드가 완료되기 전에 이전 씬의 Context를 즉시 강제 파괴하여 자리를 비움
+                if (SceneContext.Inst != null)
+                {
+                    // 자동으로 OnDisable도 실행되지만 명시적 비활성화로 안전하게 처리
+                    SceneContext.Inst.gameObject.SetActive(false);
+                    Destroy(SceneContext.Inst.gameObject);
+                }
+
                 UnityEngine.SceneManagement.SceneManager.UnloadSceneAsync(currentScene);
-
-                // 이전 씬 찌꺼기가 새 씬 로딩에 개입하는 것을 막기 위해 백지화
                 currentScene = default;
-
-                // 새로운 currentScene은 OnLoadEnd 직전 SceneContext가 Awake에서 설정함
             }
 
             EventBus<SystemLoadingEvent>.Publish(new SystemLoadingEvent(SystemLoadingEvent.State.Start, "로딩 시작", 0.0f));
