@@ -5,8 +5,8 @@ using UnityEngine;
 namespace CoreEditor.Network.FishNetExtension.Manager
 {
     // true 인자를 주어 모든 파생 클래스에 자동으로 이 에디터가 적용
-    [CustomEditor(typeof(NetworkSpawnManager<,>), true)]
-    public class NetworkSpawnManagerEditor : Editor
+    [CustomEditor(typeof(BaseNetObjectSpawnManager<,>), true)]
+    public class NetObjectSpawnManagerEditor : Editor
     {
         private int _selectedIndex = -1;
 

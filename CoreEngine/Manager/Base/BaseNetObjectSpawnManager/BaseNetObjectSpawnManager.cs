@@ -20,9 +20,9 @@ namespace CoreEngine.Network.FishNetExtension.Manager
     /// <summary>
     /// 풀링 시스템과 연동되어 씬 초기화 시 서버 권위 객체들을 스폰하는 제네릭 매니저
     /// </summary>
-    public abstract class NetworkSpawnManager<TPoolType, TPoolManager> : BaseNetworkManager 
+    public abstract class BaseNetObjectSpawnManager<TPoolType, TPoolManager> : BaseNetworkManager 
         where TPoolType : Enum
-        where TPoolManager : ObjectPoolManager<TPoolType>
+        where TPoolManager : BaseNetObjectPoolManager<TPoolType>
     {
         [Header("Spawn Settings")]
         [Tooltip("CSV 또는 에디터 기즈모를 통해 세팅된 초기 스폰 데이터")]
@@ -84,11 +84,12 @@ namespace CoreEngine.Network.FishNetExtension.Manager
             foreach (var data in spawnDataList)
             {
                 // 풀에서 객체를 꺼내고 FishNet 서버 권위로 스폰
+                // BaseNetObjectPoolManager(NetObjectPoolHandler)가 FishNet 서버 권위로 Spawn을 처리하도록 설계되어 있으므로,
+                // 여기서는 단순히 풀에서 꺼내기만 하면 됨
                 GameObject obj = poolManager.Spawn(data.poolType, data.position);
                 if (obj != null)
                 {
                     obj.transform.eulerAngles = data.rotation;
-                    base.ServerManager.Spawn(obj);
                 }
             }
 
