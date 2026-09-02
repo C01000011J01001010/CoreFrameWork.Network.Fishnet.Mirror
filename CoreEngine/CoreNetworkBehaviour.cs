@@ -25,14 +25,9 @@ namespace CoreEngine.Network.FishNetExtension
         private bool _isRegistered = false;
 
         // 위버가 코드를 안전하게 찔러넣을 수 있는 공간이면서 외부 접근은 완벽히 차단
-        protected virtual void Awake()
+        public virtual void Awake()
         {
             // 컴파일 시 FishNet Weaver가 여기에 NetworkInitialize___Early() 등을 몰래 주입할 수 있음
-        }
-
-        protected virtual void OnDestroy()
-        {
-            // 컴파일 시 FishNet Weaver가 여기에 네트워크 메모리 해제 로직을 몰래 주입할 수 있음
         }
 
 
