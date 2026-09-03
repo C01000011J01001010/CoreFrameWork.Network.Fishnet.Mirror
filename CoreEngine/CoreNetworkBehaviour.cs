@@ -60,9 +60,8 @@ namespace CoreEngine.Network.FishNetExtension
 
         public override void OnStartNetwork()
         {
-            // 순수 Client는 NetObjectPoolHandler에 의해 PoolManager의 Spawn 접근 자체를 차단당함
-            // ServerManager.Spawn에 의해 풀에서 꺼내지니 여기서 OnSpawn 처리를 해야함
-            if (_cachedPoolable != null && !InstanceFinder.IsServerStarted)
+            // ServerManager에 의해 온전히 Spawn이 완료될 때 OnSpawn 처리
+            if (_cachedPoolable != null)
                 _cachedPoolable.OnSpawn();
         }
 

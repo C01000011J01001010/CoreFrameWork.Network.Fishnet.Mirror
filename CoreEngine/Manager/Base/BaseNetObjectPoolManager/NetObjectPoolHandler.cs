@@ -17,8 +17,9 @@ namespace CoreEngine.Network.FishNetExtension.Manager.Pool
             // 서버 권한 없이 순수 클라이언트로 접속한 경우 스폰 로직을 즉시 탈출
             if (!InstanceFinder.IsServerStarted) return null;
 
-            IPoolable pObj = base.Spawn(position, rotation); // -> OnSpawn() 호출됨
+            IPoolable pObj = base.Spawn(position, rotation);
             InstanceFinder.ServerManager.Spawn(pObj.gameObject);
+            // OnSpawn은 CoreNetworkBehaviour의 OnStartNetwork에서 처리
             return pObj;
         }
 
