@@ -1,6 +1,7 @@
 ﻿using CoreEngine.Facades;
 using CoreEngine.Helpers;
 using CoreEngine.Manager;
+using CoreEngine.Manager.Pool;
 using FishNet;
 using System;
 using System.Collections;
@@ -86,10 +87,10 @@ namespace CoreEngine.Network.FishNetExtension.Manager
                 // 풀에서 객체를 꺼내고 FishNet 서버 권위로 스폰
                 // BaseNetObjectPoolManager(NetObjectPoolHandler)가 FishNet 서버 권위로 Spawn을 처리하도록 설계되어 있으므로,
                 // 여기서는 단순히 풀에서 꺼내기만 하면 됨
-                GameObject obj = poolManager.Spawn(data.poolType, data.position);
-                if (obj != null)
+                IPoolable pObj = poolManager.Spawn(data.poolType, data.position);
+                if (pObj != null)
                 {
-                    obj.transform.eulerAngles = data.rotation;
+                    pObj.transform.eulerAngles = data.rotation;
                 }
             }
 

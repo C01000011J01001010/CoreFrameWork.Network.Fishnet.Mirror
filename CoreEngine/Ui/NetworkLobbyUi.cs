@@ -1,5 +1,6 @@
 using CoreEngine.EventBus;
 using CoreEngine.Facades;
+using CoreEngine.Manager.Pool;
 using CoreEngine.Network.Pool;
 using CoreEngine.SceneManagement;
 using FishNet;
@@ -73,14 +74,14 @@ namespace CoreEngine.Network.Lobby.Ui
             if (_activeItems.ContainsKey(clientId)) return;
 
             // Facade를 통해 NetworkPoolManager 구체 클래스로 접근[cite: 1]
-            var poolManager = CoreFacade.GetManager<NetworkPoolManager>();
+            var poolManager = CoreFacade.GetManager<NetworkLobbyPoolManager>();
             if (poolManager == null) return;
 
             // 풀에서 스폰 후 Content 하위로 이동 (UI 크기 왜곡 방지를 위해 SetParent의 두 번째 인자를 false로 설정)
-            GameObject obj = poolManager.Spawn(NetworkPoolType.LobbyClientBox, Vector3.zero);
-            obj.transform.SetParent(contentParent, false);
+            IPoolable pObj = poolManager.Spawn(NetworkLobbyPoolType.LobbyClientBox, Vector3.zero);
+            pObj.transform.SetParent(contentParent, false);
 
-            if (obj.TryGetComponent(out NetworkLobbyClientBox item))
+            if (pObj.TryGetComponent(out NetworkLobbyClientBox item))
             {
                 bool isLocal = false;
 
