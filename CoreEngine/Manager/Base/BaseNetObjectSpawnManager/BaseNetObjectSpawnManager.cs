@@ -85,13 +85,9 @@ namespace CoreEngine.Network.FishNetExtension.Manager
             foreach (var data in spawnDataList)
             {
                 // 풀에서 객체를 꺼내고 FishNet 서버 권위로 스폰
-                // BaseNetObjectPoolManager(NetObjectPoolHandler)가 FishNet 서버 권위로 Spawn을 처리하도록 설계되어 있으므로,
+                // BaseNetObjectPoolManager(NetObjectPoolHandler)가 FishNet 서버 권위로 Spawn을 처리하도록 설계되어 있으므로
                 // 여기서는 단순히 풀에서 꺼내기만 하면 됨
-                IPoolable pObj = poolManager.Spawn(data.poolType, data.position);
-                if (pObj != null)
-                {
-                    pObj.transform.eulerAngles = data.rotation;
-                }
+                poolManager.Spawn(data.poolType, data.position, Quaternion.Euler(data.rotation));
             }
 
             LogHelper.Log($"[{this.GetType().Name}] {spawnDataList.Count}개의 인게임 객체 동적 스폰 완료!", LogColor.Green);

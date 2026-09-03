@@ -12,12 +12,12 @@ namespace CoreEngine.Network.FishNetExtension.Manager.Pool
     public class NetObjectPoolHandler<TPoolType> : BasePoolHandler<TPoolType> where TPoolType : System.Enum
     {
         // Pool에서 Spawn -> OnSpawn -> ServerManager.Spawn
-        public override IPoolable Spawn(Vector3 position)
+        public override IPoolable Spawn(Vector3 position, Quaternion rotation, Transform parent = null)
         {
             // 서버 권한 없이 순수 클라이언트로 접속한 경우 스폰 로직을 즉시 탈출
             if (!InstanceFinder.IsServerStarted) return null;
 
-            IPoolable pObj = base.Spawn(position); // -> OnSpawn() 호출됨
+            IPoolable pObj = base.Spawn(position, rotation); // -> OnSpawn() 호출됨
             InstanceFinder.ServerManager.Spawn(pObj.gameObject);
             return pObj;
         }

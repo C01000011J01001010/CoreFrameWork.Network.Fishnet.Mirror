@@ -78,7 +78,7 @@ namespace CoreEngine.Network.Lobby.Ui
             if (poolManager == null) return;
 
             // 풀에서 스폰 후 Content 하위로 이동 (UI 크기 왜곡 방지를 위해 SetParent의 두 번째 인자를 false로 설정)
-            IPoolable pObj = poolManager.Spawn(NetworkLobbyPoolType.LobbyClientBox, Vector3.zero);
+            IPoolable pObj = poolManager.Spawn(NetworkLobbyPoolType.LobbyClientBox, Vector3.zero, Quaternion.identity);
             pObj.transform.SetParent(contentParent, false);
 
             if (pObj.TryGetComponent(out NetworkLobbyClientBox item))
