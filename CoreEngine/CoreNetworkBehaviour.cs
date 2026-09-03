@@ -1,6 +1,7 @@
 ﻿using CoreEngine.EventBus;
 using CoreEngine.Manager.Pool;
 using CoreEngine.Network.FishNetExtension.Extensions;
+using FishNet;
 using FishNet.Connection;
 using FishNet.Object;
 
@@ -55,6 +56,14 @@ namespace CoreEngine.Network.FishNetExtension
             base.OnOwnershipClient(prevOwner);
             this.TryUnregisterNetworkTick(ref _isRegistered);
             this.TryRegisterNetworkTick(ref _isRegistered, networkTickTarget);
+        }
+
+        public override void OnStartNetwork()
+        {
+            // 순수 Client는 NetObjectPoolHandler에 의해 PoolManager의 Spawn 접근 자체를 차단당함
+            // ServerManager.Spawn에 의해 풀에서 꺼내지니 여기서 OnSpawn 처리를 해야함
+            if (_cachedPoolable != null && !InstanceFinder.IsServerStarted)
+                _cachedPoolable.OnSpawn();
         }
 
         public override void OnStopNetwork()
