@@ -1,4 +1,5 @@
 ﻿using CoreEngine.EventBus;
+using CoreEngine.Manager.Pool;
 using CoreEngine.Network.FishNetExtension.Extensions;
 using FishNet.Connection;
 using FishNet.Object;
@@ -24,10 +25,13 @@ namespace CoreEngine.Network.FishNetExtension
         // ref로 넘기기 위해 인스턴스가 쥐고 있는 상태값
         private bool _isRegistered = false;
 
-        // 위버가 코드를 안전하게 찔러넣을 수 있는 공간이면서 외부 접근은 완벽히 차단
+        private IPoolable _cachedPoolable;
+
+        // 위버가 코드를 안전하게 찔러넣을 수 있는 공간
+        // 컴파일 시 FishNet Weaver가 여기에 NetworkInitialize___Early() 등을 몰래 주입할 수 있음
         public virtual void Awake()
         {
-            // 컴파일 시 FishNet Weaver가 여기에 NetworkInitialize___Early() 등을 몰래 주입할 수 있음
+            _cachedPoolable = GetComponent<IPoolable>();
         }
 
 
@@ -51,6 +55,13 @@ namespace CoreEngine.Network.FishNetExtension
             base.OnOwnershipClient(prevOwner);
             this.TryUnregisterNetworkTick(ref _isRegistered);
             this.TryRegisterNetworkTick(ref _isRegistered, networkTickTarget);
+        }
+
+        public override void OnStopNetwork()
+        {
+            // Releaser(PoolHandler)는 순수C#객체이니 ?.Release로 null 판별
+            if (_cachedPoolable != null) 
+                _cachedPoolable.Releaser?.Release(_cachedPoolable);
         }
     }
 }
