@@ -1,5 +1,5 @@
 ﻿using FishNet.Object;
-using CoreEngine.Extentions;
+using CoreEngine.Extensions;
 
 namespace CoreEngine.Network.FishNetExtension.Extensions
 {

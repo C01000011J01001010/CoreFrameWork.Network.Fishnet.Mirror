@@ -1,4 +1,4 @@
-using CoreEngine.Extentions;
+using CoreEngine.Extensions;
 using UnityEngine;
 
 namespace CoreEngine.Network.FishNetExtension
