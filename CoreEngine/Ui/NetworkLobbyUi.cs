@@ -63,13 +63,13 @@ namespace CoreEngine.Network.Lobby.Ui
         {
             switch (evt.clientUpdate)
             {
-                case ClientUpdate.Add: AddClientToScrollView(evt.ClientId, evt.IpAddress); break;
+                case ClientUpdate.Add: AddClientToScrollView(evt.ClientId, evt.IpAddress, evt.EntryOrder); break;
                 case ClientUpdate.Remove: RemoveClientFromScrollView(evt.ClientId); break;
                 case ClientUpdate.Clear: ClearAllClientItems(); break;
             }
         }
 
-        private void AddClientToScrollView(int clientId, string ip)
+        private void AddClientToScrollView(int clientId, string ip, int entryOrder)
         {
             if (_activeItems.ContainsKey(clientId)) return;
 
@@ -80,6 +80,9 @@ namespace CoreEngine.Network.Lobby.Ui
             // 풀에서 스폰 후 Content 하위로 이동 (UI 크기 왜곡 방지를 위해 SetParent의 두 번째 인자를 false로 설정)
             IPoolable pObj = poolManager.Spawn(NetworkLobbyPoolType.LobbyClientBox, Vector3.zero, Quaternion.identity);
             pObj.transform.SetParent(contentParent, false);
+
+            // 입장순서대로 지급받기
+            pObj.transform.SetSiblingIndex(entryOrder);
 
             if (pObj.TryGetComponent(out NetworkLobbyClientBox item))
             {

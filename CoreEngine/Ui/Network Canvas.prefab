@@ -3210,14 +3210,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d381668a492ea1d408847ff292c9351c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CoreEngine.Lobby.Ui.LobbyUi
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 0}
+  _networkObjectCache: {fileID: 0}
   contentParent: {fileID: 3897757980910931800}
   gameStartButton: {fileID: 6777082030241517928}
   exitRoomButton: {fileID: 1401559208482692727}
   myProfileColor: {r: 0, g: 1, b: 0, a: 1}
   NextScene:
     sceneAsset: {fileID: 102900000, guid: 4095b45651786bf4488e1fab7317d42e, type: 3}
-    scenePath: Assets/CoreFramework.Network.Fishnet/Ui/TestScene/InGameScene.unity
-    sceneName: InGameScene
+    scenePath: 
+    sceneName: 
+    sceneGUID: 
 --- !u!1 &5721709291491152925
 GameObject:
   m_ObjectHideFlags: 0
@@ -4959,7 +4963,10 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4938327698877780399, guid: 9b688e84b1102294da7ca6d459b20798, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4756496701784428959}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5954753323224219564, guid: 9b688e84b1102294da7ca6d459b20798, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: 9b688e84b1102294da7ca6d459b20798, type: 3}
 --- !u!224 &8603068388920791627 stripped
 RectTransform:
