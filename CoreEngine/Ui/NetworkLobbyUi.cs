@@ -1,6 +1,6 @@
 using CoreEngine.EventBus;
 using CoreEngine.Facades;
-using CoreEngine.Manager.Pool;
+using CoreEngine.Pool;
 using CoreEngine.Network.Pool;
 using CoreEngine.SceneManagement;
 using FishNet;

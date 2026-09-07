@@ -5,7 +5,7 @@ using FishNet.Transporting;
 using FishNet.Transporting.Tugboat;
 using UnityEngine;
 
-namespace CoreEngine.Network.FishNetExtension.Manager
+namespace CoreEngine.Network.FishNetExtension.NetworkSession
 {
     public class NetworkSessionManager : BaseManager
     {

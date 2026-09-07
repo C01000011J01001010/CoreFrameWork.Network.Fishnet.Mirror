@@ -6,7 +6,7 @@ using FishNet.Observing;
 using CoreEngine.EventBus;
 using CoreEngine.Network.Lobby;
 
-namespace CoreEngine.Network.FishNetExtension.Manager
+namespace CoreEngine.Network.FishNetExtension.Lobby
 {
     public struct LobbyPlayerData
     {

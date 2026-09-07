@@ -1,5 +1,5 @@
 ﻿using CoreEngine.EventBus;
-using CoreEngine.Manager.Pool;
+using CoreEngine.Pool;
 using CoreEngine.Network.FishNetExtension.Extensions;
 using FishNet;
 using FishNet.Connection;

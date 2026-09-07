@@ -1,13 +1,11 @@
-using CoreEngine.Manager;
-using CoreEngine.Manager.Pool;
-using CoreEngine.Network.FishNetExtension.Manager.Pool;
-using FishNet;
+using CoreEngine;
+using CoreEngine.Pool;
+using CoreEngine.Pool;
 using FishNet.Object;
 using System;
 using UnityEngine;
-using static UnityEditor.MaterialProperty;
 
-namespace CoreEngine.Network.FishNetExtension.Manager
+namespace CoreEngine.Network.FishNetExtension.Pool
 {
     /// <summary>
     /// 로컬 풀링 시스템을 상속받아 네트워크 스폰/디스폰 통제권을 결합한 매니저

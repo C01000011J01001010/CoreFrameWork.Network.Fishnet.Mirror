@@ -1,5 +1,5 @@
 using UnityEngine;
-namespace CoreEngine.Network.FishNetExtension.Manager.NetObjectSpawn.Test
+namespace CoreEngine.Network.FishNetExtension.Spawn.Test
 {
     public enum TestPoolType
     {

@@ -1,10 +1,10 @@
-using CoreEngine.Manager.Pool;
+using CoreEngine.Pool;
 using FishNet;
 using FishNet.Object;
 using UnityEngine;
 using System.Threading.Tasks;
 
-namespace CoreEngine.Network.FishNetExtension.Manager.Pool
+namespace CoreEngine.Network.FishNetExtension.Pool
 {
     /// <summary>
     /// 순수 C# 풀러(PoolHandler)를 상속받아 네트워크 통제권만 덧씌운 부품

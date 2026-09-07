@@ -4,7 +4,7 @@ using CoreEngine.EventBus;
 using UnityEngine;
 using CoreEngine.Director;
 
-namespace CoreEngine.Network.FishNetExtension
+namespace CoreEngine.Network.FishNetExtension.SceneManagement
 {
     public class NetworkSceneFlowDirector : SceneFlowDirector
     {
