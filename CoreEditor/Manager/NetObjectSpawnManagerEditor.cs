@@ -1,8 +1,8 @@
-using CoreEngine.Network.FishNetExtension.Manager;
+using CoreEngine.Network.FishNetExtension.Spawn;
 using UnityEditor;
 using UnityEngine;
 
-namespace CoreEditor.Network.FishNetExtension.Manager
+namespace CoreEditor.Network.FishNetExtension.Spawn
 {
     // true 인자를 주어 모든 파생 클래스에 자동으로 이 에디터가 적용
     [CustomEditor(typeof(BaseNetObjectSpawnManager<,>), true)]

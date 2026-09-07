@@ -1,6 +1,8 @@
 ﻿using CoreEngine.EventBus;
 using CoreEngine.Facades;
 using CoreEngine.Helpers;
+using CoreEngine.Network.FishNetExtension.Pool;
+using CoreEngine.Pool;
 using FishNet;
 using FishNet.Connection;
 using FishNet.Object;
@@ -9,7 +11,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace CoreEngine.Network.FishNetExtension.Manager
+namespace CoreEngine.Network.FishNetExtension.Spawn
 {
     [Serializable]
     public class SpawnData<TPoolType> where TPoolType : Enum
@@ -55,7 +57,7 @@ namespace CoreEngine.Network.FishNetExtension.Manager
     /// <summary>
     /// 풀링 시스템과 연동되어 씬 초기화 시 서버 권위 객체들을 스폰하는 제네릭 매니저
     /// </summary>
-    public abstract class BaseNetObjectSpawnManager<TPoolType, TPoolManager> : BaseNetworkManager 
+    public abstract class BaseNetObjectSpawnManager<TPoolType, TPoolManager> : BaseNetSpawnBridge
         where TPoolType : Enum
         where TPoolManager : BaseNetObjectPoolManager<TPoolType>
     {
@@ -134,50 +136,42 @@ namespace CoreEngine.Network.FishNetExtension.Manager
 
         private void OnDynamicSpawnRequested(DynamicSpawnRequestEvent<TPoolType> evt)
         {
-            if (InstanceFinder.IsOffline) return;
-
-            // 객체를 통째로 넘기지 않고 안전한 기본 타입들만 분해해서 전송
-            int poolTypeInt = Convert.ToInt32(evt.SpawnData.poolType);
-            RequestSpawnServerRpc(poolTypeInt, evt.SpawnData.position, Quaternion.Euler( evt.SpawnData.rotation), evt.IsOwner, evt.SpawnData.parentNetObj);
-        }
-
-        // RequireOwnership = false: 이 매니저의 주인이 아니어도 호출 가능
-        // NetworkConnection caller: 호출한 클라이언트가 누구인지 FishNet이 자동 식별
-        [ServerRpc(RequireOwnership = false)]
-        private void RequestSpawnServerRpc(int poolTypeInt, Vector3 position, Quaternion rotation, bool isowner, NetworkObject parentNetObj, NetworkConnection caller = null)
-        {
-            StartCoroutine(DynamicSpawn(poolTypeInt,position,rotation,isowner,parentNetObj, caller));
-        }
-
-        private IEnumerator DynamicSpawn(int poolTypeInt, Vector3 position, Quaternion rotation, bool isowner, NetworkObject parentNetObj, NetworkConnection caller)
-        {
-            while (!IsServerStarted) yield return null;
-
-            var poolManager = CoreFacade.GetManager<TPoolManager>();
-            if (poolManager == null) yield break;
-
-            // 데이터 복구
-            TPoolType poolType = (TPoolType)Enum.ToObject(typeof(TPoolType), poolTypeInt);
-
-            Transform parent = null;
-            // 부모로 설정할 Caller의 네트워크 객체가 있다면 설정
-            if (parentNetObj != null && parentNetObj.Owner == caller)
+            if (!InstanceFinder.IsOffline)
             {
-                parent = parentNetObj.transform;
+                int poolTypeInt = Convert.ToInt32(evt.SpawnData.poolType);
+                // 부모의 비제네릭 ServerRpc 호출
+                RequestSpawnServerRpc(poolTypeInt, evt.SpawnData.position, Quaternion.Euler(evt.SpawnData.rotation), evt.IsOwner, evt.SpawnData.parentNetObj);
+            }
+        }
+
+        // [ServerRpc] 속성 제거: RPC는 비제네릭 부모가 받고, 실제 처리는 여기서 오버라이드
+        protected override void OnServerSpawnRequested(int poolTypeInt, Vector3 position, Quaternion rotation, bool isOwner, NetworkObject parentNetObj, NetworkConnection caller)
+        {
+            StartCoroutine(DynamicSpawn(poolTypeInt, position, rotation, isOwner, parentNetObj, caller));
+        }
+
+        private IEnumerator DynamicSpawn(int poolTypeInt, Vector3 position, Quaternion rotation, bool isOwner, NetworkObject parentNetObj, NetworkConnection caller)
+        {
+            while (!base.IsServerStarted)
+            {
+                yield return null;
             }
 
-            // 서버가 풀에서 객체를 꺼냄
-            var pObj = poolManager.Spawn(poolType, position, rotation, parent);
-
-            // 꺼낸 객체가 네트워크 객체인지 확인
-            if (pObj.TryGetComponent(out NetworkObject networkObject))
+            TPoolManager poolManager = CoreFacade.GetManager<TPoolManager>();
+            if (poolManager != null)
             {
-                // 소유를 주장한다면 소유권 부여
-                if (isowner && caller != null && caller.IsValid)
+                TPoolType poolType = (TPoolType)Enum.ToObject(typeof(TPoolType), poolTypeInt);
+                Transform parent = null;
+                if (parentNetObj != null && parentNetObj.Owner == caller)
+                {
+                    parent = parentNetObj.transform;
+                }
+
+                IPoolable pObj = poolManager.Spawn(poolType, position, rotation, parent);
+                if (pObj.TryGetComponent<NetworkObject>(out var networkObject) && isOwner && caller != null && caller.IsValid)
                 {
                     networkObject.GiveOwnership(caller);
                 }
-                // 이후 부모 위치를 바꾸는 것은 Client에서 자발적으로 바꾸고 서버에게 알리도록 함
             }
         }
     }
