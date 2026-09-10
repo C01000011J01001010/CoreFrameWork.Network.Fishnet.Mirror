@@ -1,6 +1,7 @@
 ﻿using CoreEngine.EventBus;
-using CoreEngine.Pool;
+using CoreEngine.Facades;
 using CoreEngine.Network.FishNetExtension.Extensions;
+using CoreEngine.Pool;
 using FishNet;
 using FishNet.Connection;
 using FishNet.Object;
@@ -26,15 +27,13 @@ namespace CoreEngine.Network.FishNetExtension
         // ref로 넘기기 위해 인스턴스가 쥐고 있는 상태값
         private bool _isRegistered = false;
 
-        private IPoolable _cachedPoolable;
+        // 초기화 상태 모니터링 프로퍼티
+        protected bool IsProjectReady => CoreFacadeState.ProjectInit;
+        protected bool IsSceneReady => CoreFacadeState.SceneInit;
 
         // 위버가 코드를 안전하게 찔러넣을 수 있는 공간
         // 컴파일 시 FishNet Weaver가 여기에 NetworkInitialize___Early() 등을 몰래 주입할 수 있음
-        public virtual void Awake()
-        {
-            _cachedPoolable = GetComponent<IPoolable>();
-        }
-
+        public virtual void Awake() { }
 
         protected virtual void OnEnable()
         {
@@ -58,18 +57,6 @@ namespace CoreEngine.Network.FishNetExtension
             this.TryRegisterNetworkTick(ref _isRegistered, networkTickTarget);
         }
 
-        public override void OnStartNetwork()
-        {
-            // ServerManager에 의해 온전히 Spawn이 완료될 때 OnSpawn 처리
-            if (_cachedPoolable != null)
-                _cachedPoolable.OnSpawn();
-        }
-
-        public override void OnStopNetwork()
-        {
-            // Releaser(PoolHandler)는 순수C#객체이니 ?.Release로 null 판별
-            if (_cachedPoolable != null) 
-                _cachedPoolable.Releaser?.Release(_cachedPoolable);
-        }
+        
     }
 }
