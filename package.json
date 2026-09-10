@@ -1,10 +1,10 @@
 {
   "name": "com.ycjun.core-framework.network.fishnet",
   "displayName": "CoreFramework FishNet Extension",
-  "version": "1.0.20",
+  "version": "1.0.21",
   "description": "CoreFramework integration for FishNet Networking",
   "dependencies": {
-    "com.ycjun.core-framework": "1.0.28",
+    "com.ycjun.core-framework": "1.0.31",
     "com.firstgeargames.fishnet": "4.7.2"
   }
 }
