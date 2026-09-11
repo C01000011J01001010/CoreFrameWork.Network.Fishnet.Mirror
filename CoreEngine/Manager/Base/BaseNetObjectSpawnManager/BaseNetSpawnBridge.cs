@@ -19,5 +19,6 @@ namespace CoreEngine.Network.FishNetExtension.Spawn
         /// 서버에서 RPC 수신 시 호출되는 가상 메서드 (자식 제네릭 클래스에서 로직 오버라이드)
         /// </summary>
         protected abstract void OnServerSpawnRequested(int poolTypeInt, Vector3 position, Quaternion rotation, bool isOwner, NetworkObject parentNetObj, NetworkConnection caller);
+
     }
 }
