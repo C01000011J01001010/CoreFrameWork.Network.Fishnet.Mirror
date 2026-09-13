@@ -875,6 +875,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CoreEngine.Network.Fishnet::CoreEngine.Network.FishNetExtension.Pool.Test.TestNetObjectSpawnButton
   targetPoolType: 0
+  _isOwner: 1
 --- !u!1001 &1291319002
 PrefabInstance:
   m_ObjectHideFlags: 0

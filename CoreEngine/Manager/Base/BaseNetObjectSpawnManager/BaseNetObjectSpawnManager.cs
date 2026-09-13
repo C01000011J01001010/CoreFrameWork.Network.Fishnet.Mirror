@@ -47,13 +47,10 @@ namespace CoreEngine.Network.FishNetExtension.Spawn
     {
         public RequestSpawnData<TPoolType> SpawnData;
         public bool IsOwner; // 소유를 주장할것인지 여부
-        public bool IsGlobal; // 전역씬에 둘것인지
-
-        public SpawnRequestEvent(RequestSpawnData<TPoolType> spawnData, bool isOwner = false, bool isGlobal = false)
+        public SpawnRequestEvent(RequestSpawnData<TPoolType> spawnData, bool isOwner = false)
         {
             SpawnData = spawnData;
             IsOwner = isOwner;
-            IsGlobal = isGlobal;
         }
     }
 
@@ -147,16 +144,16 @@ namespace CoreEngine.Network.FishNetExtension.Spawn
 
             int poolTypeInt = Convert.ToInt32(evt.SpawnData.poolType);
             // 부모의 비제네릭 ServerRpc 호출
-            RequestSpawnServerRpc(poolTypeInt, evt.SpawnData.position, Quaternion.Euler(evt.SpawnData.rotation), evt.IsOwner, evt.IsGlobal, evt.SpawnData.parentNetObj);
+            RequestSpawnServerRpc(poolTypeInt, evt.SpawnData.position, Quaternion.Euler(evt.SpawnData.rotation), evt.IsOwner, evt.SpawnData.parentNetObj);
         }
 
         // [ServerRpc] 속성 제거: RPC는 비제네릭 부모가 받고, 실제 처리는 여기서 오버라이드
-        protected override void OnServerSpawnRequested(int poolTypeInt, Vector3 position, Quaternion rotation, bool isOwner, bool isGlobal, NetworkObject parentNetObj, NetworkConnection caller)
+        protected override void OnServerSpawnRequested(int poolTypeInt, Vector3 position, Quaternion rotation, bool isOwner, NetworkObject parentNetObj, NetworkConnection caller)
         {
-            StartCoroutine(DynamicSpawn(poolTypeInt, position, rotation, isOwner, isGlobal, parentNetObj, caller));
+            StartCoroutine(DynamicSpawn(poolTypeInt, position, rotation, isOwner, parentNetObj, caller));
         }
 
-        private IEnumerator DynamicSpawn(int poolTypeInt, Vector3 position, Quaternion rotation, bool isOwner, bool isGlobal, NetworkObject parentNetObj, NetworkConnection caller)
+        private IEnumerator DynamicSpawn(int poolTypeInt, Vector3 position, Quaternion rotation, bool isOwner, NetworkObject parentNetObj, NetworkConnection caller)
         {
             while (!base.IsServerStarted)
             {
@@ -176,11 +173,7 @@ namespace CoreEngine.Network.FishNetExtension.Spawn
                 IPoolable pObj = poolManager.Spawn(poolType, position, rotation, parent);
                 if (pObj.TryGetComponent<NetworkObject>(out var networkObject))
                 {
-                    LogHelper.Log($"전역씬 : {CoreFacade.GetGlobalScene().name}");
-                    LogHelper.Log($"현재씬 : {CoreFacade.GetCurrentScene().name}");
-                    ServerManager.Spawn(networkObject, 
-                        isOwner ? caller : null, 
-                        isGlobal? CoreFacade.GetGlobalScene() : CoreFacade.GetCurrentScene());
+                    ServerManager.Spawn(networkObject, isOwner ? caller : null);
                 }
             }
         }

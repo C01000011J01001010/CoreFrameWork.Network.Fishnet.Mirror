@@ -1,10 +1,12 @@
 ﻿using CoreEngine.EventBus;
+using CoreEngine.Extensions;
 using CoreEngine.Facades;
 using CoreEngine.Network.FishNetExtension.Extensions;
 using CoreEngine.Pool;
 using FishNet;
 using FishNet.Connection;
 using FishNet.Object;
+using UnityEngine;
 
 namespace CoreEngine.Network.FishNetExtension
 {
@@ -57,6 +59,14 @@ namespace CoreEngine.Network.FishNetExtension
             this.TryRegisterNetworkTick(ref _isRegistered, networkTickTarget);
         }
 
-        
+        public override void OnStartNetwork()
+        {
+            // Spawn된 객체
+            if(this is IPoolable)
+            {
+                var scene = NetworkObject.IsGlobal ? CoreFacade.GetGlobalScene() : CoreFacade.GetCurrentScene();
+                gameObject.MoveScene(scene);
+            }
+        }
     }
 }

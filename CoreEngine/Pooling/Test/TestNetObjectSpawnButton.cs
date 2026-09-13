@@ -8,11 +8,7 @@ namespace CoreEngine.Network.FishNetExtension.Pool.Test
     public class TestNetObjectSpawnButton : BaseTestSpawnButton<TestPoolType>
     {
         [SerializeField]
-        private bool _isOwner = false;
-
-        [SerializeField]
-        private bool _isGlobal = false;
-
+        private bool _isOwner = true;
 
         protected override void OnClickSpawn()
         {
@@ -20,7 +16,7 @@ namespace CoreEngine.Network.FishNetExtension.Pool.Test
             Vector3 randomRot = new Vector3(Random.Range(0, 360), Random.Range(0, 360), Random.Range(0, 360));
             RequestSpawnData<TestPoolType> _spawnData = new(targetPoolType, randomPos, randomRot);
 
-            SpawnRequestEvent<TestPoolType> evt = new(_spawnData, _isOwner, _isGlobal);
+            SpawnRequestEvent<TestPoolType> evt = new(_spawnData, _isOwner);
             EventBus<SpawnRequestEvent<TestPoolType>>.Publish(evt);
         }
     }

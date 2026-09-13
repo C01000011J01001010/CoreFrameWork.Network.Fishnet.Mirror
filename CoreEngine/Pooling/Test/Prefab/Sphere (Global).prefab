@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 8666140734188990825}
   - component: {fileID: 1612351905737191972}
   m_Layer: 0
-  m_Name: Sphere
+  m_Name: Sphere (Global)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -181,7 +181,7 @@ MonoBehaviour:
   RuntimeChildNetworkBehaviours: []
   _isNetworked: 1
   _isSpawnable: 1
-  _isGlobal: 0
+  _isGlobal: 1
   _initializeOrder: 0
   _preventDespawnOnDisconnect: 0
   _defaultDespawnType: 1
