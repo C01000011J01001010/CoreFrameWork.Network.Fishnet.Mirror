@@ -3,6 +3,7 @@ using CoreEngine.Facades;
 using CoreEngine.Helpers;
 using CoreEngine.Network.FishNetExtension.Pool;
 using CoreEngine.Pool;
+using CoreEngine.Settings;
 using FishNet;
 using FishNet.Connection;
 using FishNet.Object;
@@ -27,6 +28,7 @@ namespace CoreEngine.Network.FishNetExtension.Spawn
     {
         public NetworkObject parentNetObj;
 
+        public RequestSpawnData() { }
         public RequestSpawnData(
             TPoolType poolType,
             Vector3 position,
@@ -40,16 +42,27 @@ namespace CoreEngine.Network.FishNetExtension.Spawn
         }
     }
     // 누군가 동적 스폰을 원할 때 허공에 던지는 이벤트
-    public struct DynamicSpawnRequestEvent<TPoolType> : IEvent
+    public struct SpawnRequestEvent<TPoolType> : IEvent
         where TPoolType : Enum
     {
         public RequestSpawnData<TPoolType> SpawnData;
         public bool IsOwner; // 소유를 주장할것인지 여부
+        public bool IsGlobal; // 전역씬에 둘것인지
 
-        public DynamicSpawnRequestEvent(RequestSpawnData<TPoolType> spawnData, bool isOwner)
+        public SpawnRequestEvent(RequestSpawnData<TPoolType> spawnData, bool isOwner = false, bool isGlobal = false)
         {
             SpawnData = spawnData;
             IsOwner = isOwner;
+            IsGlobal = isGlobal;
+        }
+    }
+
+    public struct DespawnRequestEvent : IEvent
+    {
+        public NetworkObject networkObject;
+        public DespawnRequestEvent(NetworkObject networkObject)
+        {
+            this.networkObject  = networkObject;
         }
     }
 
@@ -57,7 +70,7 @@ namespace CoreEngine.Network.FishNetExtension.Spawn
     /// <summary>
     /// 풀링 시스템과 연동되어 씬 초기화 시 서버 권위 객체들을 스폰하는 제네릭 매니저
     /// </summary>
-    public abstract class BaseNetObjectSpawnManager<TPoolType, TPoolManager> : BaseNetSpawnBridge
+    public abstract class BaseNetObjectSpawnManager<TPoolType, TPoolManager> : BaseNetSpawnBridgeManager
         where TPoolType : Enum
         where TPoolManager : BaseNetObjectPoolManager<TPoolType>
     {
@@ -72,27 +85,19 @@ namespace CoreEngine.Network.FishNetExtension.Spawn
         // 틱 연산 완전 배제
         protected override NetworkTickTarget networkTickTarget => NetworkTickTarget.None;
 
-
-        RepeatEventConsumer<DynamicSpawnRequestEvent<TPoolType>> requestEvent;
-
-        public override void Awake()
+        protected override void OnEnable()
         {
-            base.Awake();
-            requestEvent = new RepeatEventConsumer<DynamicSpawnRequestEvent<TPoolType>>(OnDynamicSpawnRequested);
+            base.OnEnable();
+            EventBus<SpawnRequestEvent<TPoolType>>.Subscribe(OnSpawnRequested);
+
         }
-        public override void OnStartClient()
+        protected override void OnDisable()
         {
-            base.OnStartClient();
-            requestEvent.Bind();
+            base.OnDisable();
+            EventBus<SpawnRequestEvent<TPoolType>>.Unsubscribe(OnSpawnRequested);
         }
 
-        public override void OnStopClient()
-        {
-            base.OnStopClient();
-            requestEvent.Unbind();
-        }
 
-        
 
         public override IEnumerator Initialize()
         {
@@ -107,7 +112,7 @@ namespace CoreEngine.Network.FishNetExtension.Spawn
             // FishNet 서버가 완전히 올라올 때까지 대기
             while (!IsServerStarted) yield return null;
 
-            // 100% 보장된 인프라 위에서 안전하게 풀링 및 스폰 실행
+            // 안전하게 풀링 및 스폰 실행
             SpawnAllEntities();
         }
 
@@ -134,23 +139,24 @@ namespace CoreEngine.Network.FishNetExtension.Spawn
             LogHelper.Log($"[{this.GetType().Name}] {spawnDataList.Count}개의 인게임 객체 동적 스폰 완료!", LogColor.Green);
         }
 
-        private void OnDynamicSpawnRequested(DynamicSpawnRequestEvent<TPoolType> evt)
+        // -------------------------------------------------------------------------------------
+
+        private void OnSpawnRequested(SpawnRequestEvent<TPoolType> evt)
         {
-            if (!InstanceFinder.IsOffline)
-            {
-                int poolTypeInt = Convert.ToInt32(evt.SpawnData.poolType);
-                // 부모의 비제네릭 ServerRpc 호출
-                RequestSpawnServerRpc(poolTypeInt, evt.SpawnData.position, Quaternion.Euler(evt.SpawnData.rotation), evt.IsOwner, evt.SpawnData.parentNetObj);
-            }
+            if (InstanceFinder.IsOffline) return;
+
+            int poolTypeInt = Convert.ToInt32(evt.SpawnData.poolType);
+            // 부모의 비제네릭 ServerRpc 호출
+            RequestSpawnServerRpc(poolTypeInt, evt.SpawnData.position, Quaternion.Euler(evt.SpawnData.rotation), evt.IsOwner, evt.IsGlobal, evt.SpawnData.parentNetObj);
         }
 
         // [ServerRpc] 속성 제거: RPC는 비제네릭 부모가 받고, 실제 처리는 여기서 오버라이드
-        protected override void OnServerSpawnRequested(int poolTypeInt, Vector3 position, Quaternion rotation, bool isOwner, NetworkObject parentNetObj, NetworkConnection caller)
+        protected override void OnServerSpawnRequested(int poolTypeInt, Vector3 position, Quaternion rotation, bool isOwner, bool isGlobal, NetworkObject parentNetObj, NetworkConnection caller)
         {
-            StartCoroutine(DynamicSpawn(poolTypeInt, position, rotation, isOwner, parentNetObj, caller));
+            StartCoroutine(DynamicSpawn(poolTypeInt, position, rotation, isOwner, isGlobal, parentNetObj, caller));
         }
 
-        private IEnumerator DynamicSpawn(int poolTypeInt, Vector3 position, Quaternion rotation, bool isOwner, NetworkObject parentNetObj, NetworkConnection caller)
+        private IEnumerator DynamicSpawn(int poolTypeInt, Vector3 position, Quaternion rotation, bool isOwner, bool isGlobal, NetworkObject parentNetObj, NetworkConnection caller)
         {
             while (!base.IsServerStarted)
             {
@@ -168,9 +174,11 @@ namespace CoreEngine.Network.FishNetExtension.Spawn
                 }
 
                 IPoolable pObj = poolManager.Spawn(poolType, position, rotation, parent);
-                if (pObj.TryGetComponent<NetworkObject>(out var networkObject) && isOwner && caller != null && caller.IsValid)
+                if (pObj.TryGetComponent<NetworkObject>(out var networkObject))
                 {
-                    networkObject.GiveOwnership(caller);
+                    ServerManager.Spawn(networkObject, 
+                        isOwner ? caller : null, 
+                        isGlobal? CoreFacade.GetGlobalScene() : CoreFacade.GetCurrentScene());
                 }
             }
         }

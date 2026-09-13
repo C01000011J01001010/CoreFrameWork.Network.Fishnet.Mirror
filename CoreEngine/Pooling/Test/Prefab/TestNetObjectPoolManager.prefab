@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3623605465584528059
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2531281784330129907}
+  - component: {fileID: 7121094567429380756}
+  m_Layer: 0
+  m_Name: TestNetObjectPoolManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2531281784330129907
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3623605465584528059}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 109.70255, y: 127.41957, z: 12.49406}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7121094567429380756
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3623605465584528059}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 813b68f8fcd52c24baf5ccc25879efaf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CoreEngine.Network.Fishnet::CoreEngine.Network.FishNetExtension.Pool.Test.TestNetObjectPoolManager
+  myScope: 1
+  poolSetups:
+  - poolType: 0
+    prefab: {fileID: 7494733464133945814, guid: 8e8b51fd63ee81a4b8ee4f2e7047747a, type: 3}
+    defaultAmount: 3
+    defaultCapacity: 59
+    maxSize: 128
+  - poolType: 1
+    prefab: {fileID: 8937217546018649071, guid: 34ef861f738d1934e8afffce0cc5422f, type: 3}
+    defaultAmount: 7
+    defaultCapacity: 64
+    maxSize: 128

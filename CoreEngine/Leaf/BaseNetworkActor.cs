@@ -9,12 +9,6 @@ namespace CoreEngine.Network.FishNetExtension
     // 멀티플레이 객체용 3계층 Leaf 기본 클래스
     public abstract class BaseNetworkActor : BaseNetworkLeaf, IActor
     {
-        private IPoolable _cachedPoolable;
-        public override void Awake()
-        {
-            base.Awake();
-            _cachedPoolable = GetComponent<IPoolable>();
-        }
         public override void OnStartNetwork()
         {
             base.OnStartNetwork();
@@ -22,10 +16,6 @@ namespace CoreEngine.Network.FishNetExtension
             // 이 시점에는 IsServer, OwnerId 등 네트워크 정보가 완벽히 세팅되어 있습니다.
             var evt = new ActorRegistrationEvent(this, true, myScope);
             EventBus<ActorRegistrationEvent>.Publish(evt);
-
-            // ServerManager에 의해 온전히 Spawn이 완료될 때 OnSpawn 처리
-            if (_cachedPoolable != null)
-                _cachedPoolable.OnSpawn();
         }
 
         public override void OnStopNetwork()
@@ -35,10 +25,6 @@ namespace CoreEngine.Network.FishNetExtension
             // Hub에 내가 안 쓰임을 알림
             var evt = new ActorRegistrationEvent(this, false, myScope);
             EventBus<ActorRegistrationEvent>.Publish(evt);
-
-            // Releaser(PoolHandler)는 순수C#객체이니 ?.Release로 null 판별
-            if (_cachedPoolable != null)
-                _cachedPoolable.Releaser?.Release(_cachedPoolable);
         }
 
         protected IEnumerator _deferredSpawnRoutine;
