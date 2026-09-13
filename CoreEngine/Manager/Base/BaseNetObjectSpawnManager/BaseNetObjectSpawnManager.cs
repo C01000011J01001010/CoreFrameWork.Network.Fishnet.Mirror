@@ -176,6 +176,8 @@ namespace CoreEngine.Network.FishNetExtension.Spawn
                 IPoolable pObj = poolManager.Spawn(poolType, position, rotation, parent);
                 if (pObj.TryGetComponent<NetworkObject>(out var networkObject))
                 {
+                    LogHelper.Log($"전역씬 : {CoreFacade.GetGlobalScene().name}");
+                    LogHelper.Log($"현재씬 : {CoreFacade.GetCurrentScene().name}");
                     ServerManager.Spawn(networkObject, 
                         isOwner ? caller : null, 
                         isGlobal? CoreFacade.GetGlobalScene() : CoreFacade.GetCurrentScene());

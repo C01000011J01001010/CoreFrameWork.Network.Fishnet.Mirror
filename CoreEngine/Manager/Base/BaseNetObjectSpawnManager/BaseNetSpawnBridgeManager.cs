@@ -19,7 +19,7 @@ namespace CoreEngine.Network.FishNetExtension.Spawn
         [ServerRpc(RequireOwnership = false)]
         protected void RequestSpawnServerRpc(int poolTypeInt, Vector3 position, Quaternion rotation, bool isOwner, bool isGlobal, NetworkObject parentNetObj, NetworkConnection caller = null)
         {
-            OnServerSpawnRequested(poolTypeInt, position, rotation, isOwner, isOwner, parentNetObj, caller);
+            OnServerSpawnRequested(poolTypeInt, position, rotation, isOwner, isGlobal, parentNetObj, caller);
         }
 
         /// <summary>

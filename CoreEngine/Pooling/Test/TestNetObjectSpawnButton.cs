@@ -1,7 +1,5 @@
 using UnityEngine;
 using CoreEngine.Pool.Test;
-using CoreEngine.Pool;
-using CoreEngine.Facades;
 using CoreEngine.EventBus;
 using CoreEngine.Network.FishNetExtension.Spawn;
 
@@ -9,6 +7,12 @@ namespace CoreEngine.Network.FishNetExtension.Pool.Test
 {
     public class TestNetObjectSpawnButton : BaseTestSpawnButton<TestPoolType>
     {
+        [SerializeField]
+        private bool _isOwner = false;
+
+        [SerializeField]
+        private bool _isGlobal = false;
+
 
         protected override void OnClickSpawn()
         {
@@ -16,7 +20,7 @@ namespace CoreEngine.Network.FishNetExtension.Pool.Test
             Vector3 randomRot = new Vector3(Random.Range(0, 360), Random.Range(0, 360), Random.Range(0, 360));
             RequestSpawnData<TestPoolType> _spawnData = new(targetPoolType, randomPos, randomRot);
 
-            SpawnRequestEvent<TestPoolType> evt = new(_spawnData, false);
+            SpawnRequestEvent<TestPoolType> evt = new(_spawnData, _isOwner, _isGlobal);
             EventBus<SpawnRequestEvent<TestPoolType>>.Publish(evt);
         }
     }
