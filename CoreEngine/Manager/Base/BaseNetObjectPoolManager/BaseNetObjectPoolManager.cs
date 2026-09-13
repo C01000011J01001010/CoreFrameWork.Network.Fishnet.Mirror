@@ -17,6 +17,18 @@ namespace CoreEngine.Network.FishNetExtension.Pool
     {
         protected readonly InterfaceReceiver<INetworkSpawnDelegate> _poolRegisterReceiver = new();
 
+        protected override void Awake()
+        {
+            base.Awake();
+            _poolRegisterReceiver.Bind();
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            _poolRegisterReceiver.Unbind();
+        }
+
         protected override void OnEnable()
         {
             base.OnEnable();
