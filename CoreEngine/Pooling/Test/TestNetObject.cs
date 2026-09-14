@@ -1,6 +1,7 @@
 using CoreEngine.Helpers;
 using CoreEngine.Pool;
 using CoreEngine.Pool.Test;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace CoreEngine.Network.FishNetExtension.Pool.Test
@@ -18,15 +19,18 @@ namespace CoreEngine.Network.FishNetExtension.Pool.Test
             id = gameObject.GetInstanceID();
         }
 
-        public void OnDespawn()
-        {
-            LogHelper.Log($"({gameObject.name}.{id}) 퇴장", LogColor.Blue);
-        }
-
-        public void OnSpawn()
+        protected override void OnSafeSpawn()
         {
             LogHelper.Log($"({gameObject.name}.{id}) 등장", LogColor.Green);
-            TestPoolTracker.SpawnedObjects.Push(this);
+            TestPoolTracker.SpawnedObjects.Add(this);
+        }
+
+        protected override void OnSafeDespawn()
+        {
+            if(TestPoolTracker.SpawnedObjects.Remove(this))
+            {
+                LogHelper.Log($"({gameObject.name}.{id}) 퇴장", LogColor.Blue);
+            }
         }
     }
 

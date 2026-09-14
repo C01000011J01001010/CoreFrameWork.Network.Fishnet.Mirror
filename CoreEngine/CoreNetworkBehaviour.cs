@@ -89,21 +89,17 @@ namespace CoreEngine.Network.FishNetExtension
             // 대기 도중 Despawn되어 Pool로 반환되었거나
             // NetworkObject가 더 이상 Spawn 상태가 아니라면 종료
             if (this == null ||
-                !gameObject.activeInHierarchy ||
-                !NetworkObject.IsSpawned)
+                !gameObject.activeInHierarchy)
             {
                 _deferredSpawnRoutine = null;
                 yield break;
             }
 
             // Root 객체라면 Object 설정에 따라 Scene 이동
-            if (transform.parent == null)
+            if (transform.parent == null && !NetworkObject.IsGlobal)
             {
-                var scene = NetworkObject.IsGlobal
-                    ? CoreFacade.GetGlobalScene()
-                    : CoreFacade.GetCurrentScene();
-
-                gameObject.MoveScene(scene);
+                // IsGlobal이 true이면 NetworkManager가 알아서 보냄
+                gameObject.MoveScene(CoreFacade.GetCurrentScene());
             }
 
             // Scene 인프라와 객체 상태가 보장된 시점에서 실제 Spawn 로직 실행
