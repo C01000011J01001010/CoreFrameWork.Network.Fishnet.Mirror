@@ -1173,15 +1173,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7098604810730584157, guid: 5d54250b028ec794c83e045abbf9fe28, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 109.70255
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7098604810730584157, guid: 5d54250b028ec794c83e045abbf9fe28, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 127.41957
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7098604810730584157, guid: 5d54250b028ec794c83e045abbf9fe28, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 12.49406
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7098604810730584157, guid: 5d54250b028ec794c83e045abbf9fe28, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1251,9 +1251,9 @@ MonoBehaviour:
   _enableStateForwarding: 1
   _networkTransform: {fileID: 0}
   _ownerInterpolation: 1
-  _ownerSmoothedProperties: 255
+  _ownerSmoothedProperties: 4294967295
   _adaptiveInterpolation: 3
-  _spectatorSmoothedProperties: 255
+  _spectatorSmoothedProperties: 4294967295
   _spectatorInterpolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
@@ -1300,7 +1300,16 @@ MonoBehaviour:
   _addedNetworkObject: {fileID: 236974624311708475}
   _networkObjectCache: {fileID: 0}
   myScope: 2
-  spawnDataList: []
+  spawnDataList:
+  - poolType: 0
+    position: {x: 2.7297702, y: 2.1370373, z: 0}
+    rotation: {x: 0, y: 0, z: 0}
+  - poolType: 1
+    position: {x: 4.265648, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0}
+  - poolType: 0
+    position: {x: 6.1156664, y: 2.3395412, z: 0}
+    rotation: {x: 0, y: 0, z: 0}
   showAllCones: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

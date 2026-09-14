@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 5731763973765966508}
   - component: {fileID: 4228238216626945620}
   - component: {fileID: 7664657844182803614}
+  - component: {fileID: -6029916462612149774}
   m_Layer: 0
   m_Name: Cube (Scene)
   m_TagString: Untagged
@@ -126,9 +127,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb853d778aed8964181294539e47c31d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: CoreEngine.Network.Fishnet::CoreEngine.Network.FishNetExtension.Pool.Test.TestNetObject
-  _componentIndexCache: 255
+  _componentIndexCache: 0
   _addedNetworkObject: {fileID: 7664657844182803614}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 7664657844182803614}
 --- !u!114 &7664657844182803614
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -159,22 +160,23 @@ MonoBehaviour:
   _spectatorInterpolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
-  <PrefabId>k__BackingField: 65535
+  <PrefabId>k__BackingField: 2
   <SpawnableCollectionId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 14860308554298669153
   SceneId: 0
   SerializedTransformProperties:
-    Position: {x: 0, y: 0, z: 0}
-    Rotation: {x: 0, y: 0, z: 0, w: 0}
-    Scale: {x: 0, y: 0, z: 0}
-    IsValid: 0
+    Position: {x: 109.70255, y: 127.41957, z: 12.49406}
+    Rotation: {x: 0, y: 0, z: 0, w: 1}
+    Scale: {x: 1, y: 1, z: 1}
+    IsValid: 1
   <IsNested>k__BackingField: 0
   WasActiveDuringEdit: 0
   WasActiveDuringEdit_Set1: 1
   <ComponentIndex>k__BackingField: 0
   <PredictedSpawn>k__BackingField: {fileID: 0}
   <PredictedOwner>k__BackingField: {fileID: 0}
-  NetworkBehaviours: []
+  NetworkBehaviours:
+  - {fileID: 4228238216626945620}
   InitializedParentNetworkBehaviour: {fileID: 0}
   InitializedNestedNetworkObjects: []
   RuntimeParentNetworkBehaviour: {fileID: 0}
@@ -185,4 +187,19 @@ MonoBehaviour:
   _initializeOrder: 0
   _preventDespawnOnDisconnect: 0
   _defaultDespawnType: 1
-  _initializedTimestamp: 0
+  _initializedTimestamp: -8584122193402328094
+--- !u!114 &-6029916462612149774
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7494733464133945814}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c71fd7f855ec523429999fc4e14a1928, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FishNet.Runtime::FishNet.Observing.NetworkObserver
+  _overrideType: 3
+  _updateHostVisibility: 1
+  _observerConditions: []

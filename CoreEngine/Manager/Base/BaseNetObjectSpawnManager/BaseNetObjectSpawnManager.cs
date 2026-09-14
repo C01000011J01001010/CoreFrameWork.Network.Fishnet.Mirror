@@ -3,7 +3,6 @@ using CoreEngine.Facades;
 using CoreEngine.Helpers;
 using CoreEngine.Network.FishNetExtension.Pool;
 using CoreEngine.Pool;
-using CoreEngine.Settings;
 using FishNet;
 using FishNet.Connection;
 using FishNet.Object;
@@ -79,6 +78,8 @@ namespace CoreEngine.Network.FishNetExtension.Spawn
         [Tooltip("씬 뷰에서 전체 스폰 데이터의 방향을 원뿔로 한눈에 표시합니다.")]
         public bool showAllCones = true;
 
+        TPoolManager _poolManager;
+
         // 틱 연산 완전 배제
         protected override NetworkTickTarget networkTickTarget => NetworkTickTarget.None;
 
@@ -93,7 +94,6 @@ namespace CoreEngine.Network.FishNetExtension.Spawn
             base.OnDisable();
             EventBus<SpawnRequestEvent<TPoolType>>.Unsubscribe(OnSpawnRequested);
         }
-
 
 
         public override IEnumerator Initialize()
@@ -115,22 +115,15 @@ namespace CoreEngine.Network.FishNetExtension.Spawn
 
         private void SpawnAllEntities()
         {
-            // Facade를 통해 나와 동일한 Enum 타입을 쓰는 풀 매니저를 호출
-            // Get모듈은 구체타입을 명시해야 하므로 제네릭 타입 TPoolManager를 그대로 전달
-            var poolManager = CoreFacade.GetManager<TPoolManager>();
-
-            if (poolManager == null)
-            {
-                LogHelper.Log($"[{this.GetType().Name}] 풀 매니저를 찾을 수 없습니다.", LogColor.Red);
-                return;
-            }
+            if (!TryGetPoolManager()) return ;
 
             foreach (var data in spawnDataList)
             {
-                // 풀에서 객체를 꺼내고 FishNet 서버 권위로 스폰
-                // BaseNetObjectPoolManager(NetObjectPoolHandler)가 FishNet 서버 권위로 Spawn을 처리하도록 설계되어 있으므로
-                // 여기서는 단순히 풀에서 꺼내기만 하면 됨
-                poolManager.Spawn(data.poolType, data.position, Quaternion.Euler(data.rotation)); // 정적 스폰은 부모를 설정할 수 없음
+                IPoolable pObj = _poolManager.Spawn(data.poolType, data.position, Quaternion.Euler(data.rotation));
+                if(pObj is NetworkBehaviour netBehaviour)
+                {
+                    ServerManager.Spawn(netBehaviour.NetworkObject);
+                }
             }
 
             LogHelper.Log($"[{this.GetType().Name}] {spawnDataList.Count}개의 인게임 객체 동적 스폰 완료!", LogColor.Green);
@@ -144,38 +137,69 @@ namespace CoreEngine.Network.FishNetExtension.Spawn
 
             int poolTypeInt = Convert.ToInt32(evt.SpawnData.poolType);
             // 부모의 비제네릭 ServerRpc 호출
-            RequestSpawnServerRpc(poolTypeInt, evt.SpawnData.position, Quaternion.Euler(evt.SpawnData.rotation), evt.IsOwner, evt.SpawnData.parentNetObj);
+            RequestSpawnServerRpc(poolTypeInt, evt.SpawnData.position, evt.SpawnData.rotation, evt.IsOwner, evt.SpawnData.parentNetObj);
         }
 
         // [ServerRpc] 속성 제거: RPC는 비제네릭 부모가 받고, 실제 처리는 여기서 오버라이드
-        protected override void OnServerSpawnRequested(int poolTypeInt, Vector3 position, Quaternion rotation, bool isOwner, NetworkObject parentNetObj, NetworkConnection caller)
+        protected override void OnServerSpawnRequested(int poolTypeInt, Vector3 position, Vector3 rotation, bool isOwner, NetworkObject parentNetObj, NetworkConnection caller)
         {
+            if (isOwner) isOwner = AllowSpawnOwnership();
             StartCoroutine(DynamicSpawn(poolTypeInt, position, rotation, isOwner, parentNetObj, caller));
         }
 
-        private IEnumerator DynamicSpawn(int poolTypeInt, Vector3 position, Quaternion rotation, bool isOwner, NetworkObject parentNetObj, NetworkConnection caller)
+        /// <summary>
+        /// Client가 Spawn 요청 시 ownership을 주장했을 때 어떻게 처리할것인지 결정
+        /// </summary>
+        protected virtual bool AllowSpawnOwnership(){ return true; }
+
+        private IEnumerator DynamicSpawn(int poolTypeInt, Vector3 position, Vector3 rotation, bool isOwner, NetworkObject parentNetObj, NetworkConnection caller)
         {
-            while (!base.IsServerStarted)
+            while (!base.IsServerStarted) yield return null;
+            if (!TryGetPoolManager()) yield break;
+
+            if (!Enum.IsDefined(typeof(TPoolType), poolTypeInt))
             {
-                yield return null;
+                LogHelper.Log($"[{GetType().Name}] 잘못된 PoolType 요청: {poolTypeInt}",LogColor.Red);
+                yield break;
             }
 
-            TPoolManager poolManager = CoreFacade.GetManager<TPoolManager>();
-            if (poolManager != null)
+            TPoolType poolType = (TPoolType)Enum.ToObject(typeof(TPoolType), poolTypeInt);
+            Transform parent = null;
+            if (parentNetObj != null && parentNetObj.Owner == caller)
             {
-                TPoolType poolType = (TPoolType)Enum.ToObject(typeof(TPoolType), poolTypeInt);
-                Transform parent = null;
-                if (parentNetObj != null && parentNetObj.Owner == caller)
-                {
-                    parent = parentNetObj.transform;
-                }
+                parent = parentNetObj.transform;
+            }
 
-                IPoolable pObj = poolManager.Spawn(poolType, position, rotation, parent);
-                if (pObj.TryGetComponent<NetworkObject>(out var networkObject))
+            IPoolable pObj = _poolManager.Spawn(poolType, position, Quaternion.Euler(rotation), parent);
+            if (pObj is NetworkBehaviour netBehaviour)
+            {
+                ServerManager.Spawn(netBehaviour.NetworkObject, isOwner ? caller : null);
+
+                if(isOwner && caller == null)
                 {
-                    ServerManager.Spawn(networkObject, isOwner ? caller : null);
+                    LogHelper.LogWarning($"Spawn 요청자의 소유권이 인정됐으나, caller가 null");
                 }
             }
+        }
+
+
+        private bool TryGetPoolManager()
+        {
+            if (_poolManager != null)
+                return true;
+
+            _poolManager = CoreFacade.GetManager<TPoolManager>();
+
+            if (_poolManager == null)
+            {
+                LogHelper.Log(
+                    $"[{GetType().Name}] 풀 매니저를 찾을 수 없습니다.",
+                    LogColor.Red);
+
+                return false;
+            }
+
+            return true;
         }
     }
 }
