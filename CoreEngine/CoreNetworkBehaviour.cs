@@ -30,10 +30,6 @@ namespace CoreEngine.Network.FishNetExtension
         // ref로 넘기기 위해 인스턴스가 쥐고 있는 상태값
         private bool _isRegistered = false;
 
-        // 초기화 상태 모니터링 프로퍼티
-        protected bool IsProjectReady => CoreFacadeState.ProjectInit;
-        protected bool IsSceneReady => CoreFacadeState.SceneInit;
-
         protected IEnumerator _deferredSpawnRoutine;
         protected IEnumerator DeferredspawnRoutine => _deferredSpawnRoutine;
 
@@ -83,8 +79,7 @@ namespace CoreEngine.Network.FishNetExtension
         private IEnumerator DeferredSpawnRoutine()
         {
             // Scene 시스템이 준비될 때까지 대기
-            while (!IsSceneReady)
-                yield return null;
+            yield return new WaitUntil(CoreFacadeState.GetSceneInit);
 
             // 대기 도중 Despawn되어 Pool로 반환되었거나
             // NetworkObject가 더 이상 Spawn 상태가 아니라면 종료
