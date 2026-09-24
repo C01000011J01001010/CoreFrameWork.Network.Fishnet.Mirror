@@ -95,10 +95,9 @@ namespace CoreEngine.Network.FishNetExtension.Spawn
             EventBus<SpawnRequestEvent<TPoolType>>.Unsubscribe(OnSpawnRequested);
         }
 
-
-        public override IEnumerator Initialize()
+        protected override IEnumerator OnInitialize()
         {
-            yield return base.Initialize();
+            yield return base.OnInitialize();
 
             // 서버 권한 없이 순수 클라이언트로 접속한 경우 스폰 로직을 즉시 탈출
             if (InstanceFinder.IsClientStarted && !InstanceFinder.IsServerStarted)
