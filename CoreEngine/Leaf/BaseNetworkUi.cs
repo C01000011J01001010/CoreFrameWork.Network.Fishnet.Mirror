@@ -4,6 +4,11 @@ namespace CoreEngine.Network.FishNetExtension
 {
     public abstract class BaseNetworkUi : BaseNetworkModule, IUi
     {
+        protected virtual void Start()
+        {
+            Hide();
+        }
+
         public void Show()
         {
             ShowInternal();
